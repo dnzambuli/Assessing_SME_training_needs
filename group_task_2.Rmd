@@ -333,3 +333,14 @@ acc_nai
 ```{r}
 summary(mod_nai)
 ```
+
+# Trying a different analysis
+
+```{r}
+far_nairobi = SME_Training_Data%>% mutate(Facility = case_when(
+  Facility == 1 ~ 1,
+  Facility == 2 ~ 0,
+  TRUE ~ Facility
+))
+far_nairobi = far_nairobi[far_nairobi$Location %in% c(1, 2, 7, 9, 10),]
+```

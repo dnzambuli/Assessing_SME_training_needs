@@ -1004,6 +1004,15 @@ acc_nai</code></pre>
 </div>
 </div>
 </div>
+<div id="trying-a-different-analysis" class="section level1">
+<h1>Trying a different analysis</h1>
+<pre class="r"><code>far_nairobi = SME_Training_Data%&gt;% mutate(Facility = case_when(
+  Facility == 1 ~ 1,
+  Facility == 2 ~ 0,
+  TRUE ~ Facility
+))
+far_nairobi = far_nairobi[far_nairobi$Location %in% c(1, 2, 7, 9, 10),]</code></pre>
+</div>
 
 
 
