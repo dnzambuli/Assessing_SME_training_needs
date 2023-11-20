@@ -1,0 +1,230 @@
+---
+title: "Group Assignment Training SME"
+author: "Nzambuli Daniel"
+date: "2023-11-15"
+output: html_document
+---
+
+```{r}
+library(readxl)
+SME_Training_Data <- read_excel("SME Training Data.xlsx")
+head(SME_Training_Data)
+```
+
+# Based on Region
+
+**Task**
+
+1.  Comparing diff regions to see what ways they are similar & where they differ
+2.  The `response variable` if they need the facility for training
+
+***Note:*** Include binary & ordinal responses but disregard categorical
+
+```{r}
+str(SME_Training_Data)
+```
+
+**Ordinal Data**
+
+1.  Age group of Respondents `Age`
+2.  Education level `Education`
+3.  Region where the SME is located `Location`
+4.  Business size(number of employees) `Size`
+5.  Age of the business `Ageofbusiness`
+
+**Binary Data**
+
+1.  Gender of respondent `Gender`
+2.  Facility needed `Facility`
+3.  Presence of Disabled persons `DAP`
+
+## Ruaraka
+
+Facility `2` is No and `1` is yes encoding is done such that yes becomes `1` and no becomes `0`
+
+```{r}
+library(dplyr, warn.conflicts = FALSE)
+
+SME_Training_Data = SME_Training_Data %>% mutate(Facility = case_when(
+  Facility == 1 ~ 1,
+  Facility == 2 ~ 0,
+  TRUE ~ Facility
+))
+SME_Training_Data$Location[is.na(SME_Training_Data$Location)] = 10
+```
+
+Ruaraka is location `1` this means all other locations are `0`
+
+```{r}
+ruaraka_data = SME_Training_Data %>% mutate(Location = case_when(
+  Location == 1~1,
+  Location == 2~1,
+  Location == 7~1,
+  Location == 9~1,
+  Location == 10 ~ 1,
+  TRUE ~Location
+))
+ruaraka_data = ruaraka_data %>% mutate(Location = case_when(
+  Location != 1~0,
+  TRUE ~Location
+))
+```
+
+### Drop all columns that are not Binary or Ordinal
+
+```{r}
+colnames(SME_Training_Data)
+```
+
+**Key columns**
+
+1.  Age - 3
+2.  Education - 4
+3.  Location - 6
+4.  Size - 7
+5.  AgeofBusiness - 8
+6.  DAP - 9
+7.  Gender = 2
+8.  Facility = 12
+
+```{r}
+ruaraka_data = ruaraka_data[, c(2, 3, 4, 6, 7, 8, 9, 12)]
+colnames(ruaraka_data)
+```
+
+```{r}
+ruaraka_cols = colnames(ruaraka_data)[1: 7]
+ruaraka_cols
+```
+
+### contingency tables
+
+```{r}
+for(col in ruaraka_cols){
+  print(col)
+  print(table(facility = ruaraka_data$Facility,
+              ruaraka_data[[col]]))
+}
+```
+
+**Remove all values less than 5 to perform a chi-square test**
+
+```{r}
+for(col in ruaraka_cols){
+  print(col)
+  print(table(facility = ruaraka_data$Facility,
+              ruaraka_data[[col]])[rowMeans(table(facility = ruaraka_data$Facility,
+              ruaraka_data[[col]])) >= 5,
+              colMeans(table(facility = ruaraka_data$Facility,
+              ruaraka_data[[col]])) >= 5])
+  cat("\n\n\n")
+  print(paste("Chi-squred test of", col))
+  print(suppressWarnings(chisq.test(table(facility = ruaraka_data$Facility,
+              ruaraka_data[[col]])[rowMeans(table(facility = ruaraka_data$Facility,
+              ruaraka_data[[col]])) >= 5,
+              colMeans(table(facility = ruaraka_data$Facility,
+              ruaraka_data[[col]])) >= 5])))
+}
+```
+
+**Interpret**
+
+`Location` is the only data that can significantly predict whether an individual needs facilities in **Ruaraka**
+
+### Logistic model
+
+```{r}
+library(caTools)
+library(ROCR)
+set.seed(123)
+split_ruaraka =  sample(1:nrow(ruaraka_data), 0.8* nrow(ruaraka_data))
+train_ruaraka = ruaraka_data[split_ruaraka,]
+test_ruaraka = ruaraka_data[-split_ruaraka,]
+```
+
+```{r}
+cat("Training data has", nrow(train_ruaraka), "rows\n")
+cat("Test data has", nrow(test_ruaraka), "rows\n")
+```
+
+```{r}
+ruaraka_model = glm(Facility~Location,
+                    data = train_ruaraka, family = binomial)
+summary(ruaraka_model)
+```
+
+### Prediction and Accuracy
+
+```{r}
+pred_ruaraka = predict(ruaraka_model, 
+                       test_ruaraka,
+                       type = "response")
+pred_ruaraka = ifelse(pred_ruaraka> 0.5, 1, 0)
+reg_tab_ruaraka = table(predicted_facility = test_ruaraka$Facility, pred_ruaraka)
+reg_tab_ruaraka
+```
+
+```{r}
+odds_rat_ruaraka = exp(coef(ruaraka_model))
+odds_rat_ruaraka
+```
+
+This means that if a person is from `ruaraka` they will need the facilities in the university
+
+$$
+Need(faclity) = 2.088235 + Ruaraka 0.000007
+$$
+
+so `0.0007%` of people from Ruaraka need the facilities with atleast `2` people who will need the facilities
+
+## Embakasi
+
+```{r}
+embakasi_data = SME_Training_Data %>% mutate(Location = case_when(
+  Location != 2~0,
+  TRUE ~Location
+))
+embakasi_data = embakasi_data[, c(2, 3, 4, 6, 7, 8, 9, 12)]
+colnames(embakasi_data)
+```
+
+```{r}
+for(col in colnames(embakasi_data)[1: 7]){
+  print(col)
+  print(table(facility = embakasi_data$Facility,
+              embakasi_data[[col]]))
+}
+```
+
+```{r}
+embakasi_cols = colnames(embakasi_data[1:7])
+for(col in embakasi_cols){
+  print(col)
+  print(table(facility = embakasi_data$Facility,
+              embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,
+              embakasi_data[[col]])) >= 5,
+              colMeans(table(facility = embakasi_data$Facility,
+              embakasi_data[[col]])) >= 5])
+  cat("\n\n\n")
+  print(paste("Chi-squred test of", col))
+  print(suppressWarnings(chisq.test(table(facility = embakasi_data$Facility,
+              embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,
+              embakasi_data[[col]])) >= 5,
+              colMeans(table(facility = embakasi_data$Facility,
+              embakasi_data[[col]])) >= 5])))
+}
+```
+
+`Age of the Business` is the only data that can significantly predict whether an individual needs facilities in **Ruaraka**
+
+```{r}
+split_embakasi =  sample(1:nrow(embakasi_data), 0.8* nrow(embakasi_data))
+train_embakasi = embakasi_data[split_embakasi,]
+test_embakasi = embakasi_data[-split_embakasi,]
+```
+
+```{r}
+embakasi_model = glm(Facility~Location,
+                    data = train_embakasi, family = binomial)
+summary(embakasi_model)
+```
