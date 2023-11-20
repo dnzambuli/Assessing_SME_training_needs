@@ -28,7 +28,7 @@ head(SME_Training_Data)
 str(SME_Training_Data)
 ```
 
-### Missing-ness of the data 
+### Missing-ness of the data
 
 ```{r}
 library(dplyr, warn.conflicts = FALSE)
@@ -60,7 +60,7 @@ min(location)
 max(location)
 ```
 
-### Re-code the data back to string 
+### Re-code the data back to string
 
 ```{r}
 locality = data.frame(town = location, count = rep(1, length(location)))
@@ -122,6 +122,8 @@ The data for `location` was grouped into `near Nairobi` and `far from Nairobi` b
 
 ## Far from Nairobi
 
+Far from towns are `Ruaraka, Embakasi, Dagoretti, Roysambu, Other`
+
 Facility `2` is No and `1` is yes encoding is done such that yes becomes `1` and no becomes `0`
 
 ```{r}
@@ -177,6 +179,10 @@ colnames(far_data)
 ```{r}
 far_cols = colnames(far_data)[1: 7]
 far_cols
+```
+
+```{r}
+far_data = far_data[far_data$Location == 1,]
 ```
 
 ### contingency tables
@@ -243,80 +249,87 @@ The regression model backs up the `chi squared` test that indicated none of the 
 ```{r}
 pred_far = predict(far_model)
 pred_far = ifelse(pred_far> 0.5, 1, 0)
-reg_tab_far = table( actual_data = far_data$Facility, pred_far[1:271])
+reg_tab_far = table( actual_data = far_data$Facility[1:126] , predicted = pred_far)
 reg_tab_far
 ```
 
-#### accuracy 
+#### accuracy
 
 ```{r}
 acc_far = suppressWarnings(mean(pred_far == far_data$Facility))
 acc_far
 ```
 
-This model is `55.71%` accurate
+This model is `48.82%` accurate with coefficients of regression
 
 ```{r}
 odds_rat_far = exp(coef(far_model))
 odds_rat_far
 ```
 
-This means that if a person is from `far` they will need the facilities in the university
-
-$$
-Need(faclity) = 2.088235 + far 0.000007
-$$
-
-so `0.0007%` of people from far need the facilities with atleast `2` people who will need the facilities
-
-## Embakasi
+## Near Nairobi
 
 ```{r}
-embakasi_data = SME_Training_Data %>% mutate(Location = case_when(
-  Location != 2~0,
+library(dplyr, warn.conflicts = FALSE)
+near_nairobi = SME_Training_Data%>% mutate(Location = case_when(
+  Location == 1~1,
+  Location == 2~1,
+  Location == 7~1,
+  Location == 9~1,
+  Location == 10 ~ 1,
   TRUE ~Location
 ))
-embakasi_data = embakasi_data[, c(2, 3, 4, 6, 7, 8, 9, 12)]
-colnames(embakasi_data)
+near_nairobi = near_nairobi %>% mutate(Location = case_when(
+  Location != 1~0,
+  TRUE ~Location
+))
 ```
 
 ```{r}
-for(col in colnames(embakasi_data)[1: 7]){
-  print(col)
-  print(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]]))
-}
+near_nairobi = near_nairobi[, c(2, 3, 4, 6, 7, 8, 9, 12)]
+colnames(near_nairobi)
 ```
 
 ```{r}
-embakasi_cols = colnames(embakasi_data[1:7])
-for(col in embakasi_cols){
+near_nairobi = near_nairobi[near_nairobi$Location == 0,]
+```
+
+```{r}
+predictor_near_nai = colnames(near_nairobi[1:7])
+predictor_near_nai
+```
+
+### Create the model for near Nairobi
+
+```{r}
+for(col in predictor_near_nai){
   print(col)
-  print(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]])) >= 5,
-              colMeans(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]])) >= 5])
+  print(table(facility = near_nairobi$Facility,
+              near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,
+              near_nairobi[[col]])) >= 5,
+              colMeans(table(facility = near_nairobi$Facility,
+              near_nairobi[[col]])) >= 5])
   cat("\n\n\n")
   print(paste("Chi-squred test of", col))
-  print(suppressWarnings(chisq.test(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]])) >= 5,
-              colMeans(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]])) >= 5])))
+  print(suppressWarnings(chisq.test(table(facility = near_nairobi$Facility,
+              near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,
+              near_nairobi[[col]])) >= 5,
+              colMeans(table(facility = near_nairobi$Facility,
+              near_nairobi[[col]])) >= 5])))
 }
 ```
 
-`Age of the Business` is the only data that can significantly predict whether an individual needs facilities in **far**
+### model analysis
 
 ```{r}
-split_embakasi =  sample(1:nrow(embakasi_data), 0.8* nrow(embakasi_data))
-train_embakasi = embakasi_data[split_embakasi,]
-test_embakasi = embakasi_data[-split_embakasi,]
+mod_nai = glm(Facility~., data = near_nairobi)
+pred_nai = predict(mod_nai)
+acc_nai = suppressWarnings(mean(pred_far == far_data$Facility))
+acc_nai
 ```
 
+### Model summary
+
 ```{r}
-embakasi_model = glm(Facility~Location,
-                    data = train_embakasi, family = binomial)
-summary(embakasi_model)
+summary(mod_nai)
 ```

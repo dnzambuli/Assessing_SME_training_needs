@@ -530,6 +530,8 @@ ease of walking from the town to the CBD</p>
 </div>
 <div id="far-from-nairobi" class="section level2">
 <h2>Far from Nairobi</h2>
+<p>Far from towns are
+<code>Ruaraka, Embakasi, Dagoretti, Roysambu, Other</code></p>
 <p>Facility <code>2</code> is No and <code>1</code> is yes encoding is
 done such that yes becomes <code>1</code> and no becomes
 <code>0</code></p>
@@ -581,6 +583,7 @@ colnames(far_data)</code></pre>
 far_cols</code></pre>
 <pre><code>## [1] &quot;Gender&quot;        &quot;Age&quot;           &quot;Education&quot;     &quot;Location&quot;     
 ## [5] &quot;Size&quot;          &quot;Ageofbusiness&quot; &quot;DAP&quot;</code></pre>
+<pre class="r"><code>far_data = far_data[far_data$Location == 1,]</code></pre>
 </div>
 <div id="contingency-tables" class="section level3">
 <h3>contingency tables</h3>
@@ -593,39 +596,39 @@ far_cols</code></pre>
 }</code></pre>
 <pre><code>## [1] &quot;Gender&quot;
 ##         
-## facility   1   2
-##        0  49  40
-##        1 114  68
+## facility  1  2
+##        0 25 21
+##        1 50 31
 ## [1] &quot;Age&quot;
 ##         
-## facility   1   2   3   4   5   6
-##        0   3  57  16  10   3   0
-##        1   1 104  40  24   9   4
+## facility  1  2  3  4  5  6
+##        0  1 28 11  4  2  0
+##        1  0 49 22  7  2  1
 ## [1] &quot;Education&quot;
 ##         
 ## facility  1  2  3  4  5  6
-##        0  2 16 30 32  8  1
-##        1  5 34 59 68  9  6
+##        0  1  6 14 19  6  0
+##        1  2  7 30 34  5  3
 ## [1] &quot;Location&quot;
 ##         
-## facility   0   1
-##        0  43  46
-##        1 101  81
+## facility  1
+##        0 46
+##        1 81
 ## [1] &quot;Size&quot;
 ##         
-## facility  1  2  3  4  5
-##        0 39 42  7  0  0
-##        1 67 87 22  3  2
+## facility  1  2  3  4
+##        0 17 26  3  0
+##        1 27 43 10  1
 ## [1] &quot;Ageofbusiness&quot;
 ##         
 ## facility  1  2  3  4  5
-##        0 24 48 10  4  2
-##        1 35 83 35 14 12
+##        0 13 26  4  2  1
+##        1 14 43 15  6  3
 ## [1] &quot;DAP&quot;
 ##         
-## facility   1   2
-##        0   8  79
-##        1  25 156</code></pre>
+## facility  1  2
+##        0  5 41
+##        1  7 73</code></pre>
 <p><strong>Remove all values less than 5 to perform a chi-square
 test</strong></p>
 <pre class="r"><code>for(col in far_cols){
@@ -645,9 +648,9 @@ test</strong></p>
 }</code></pre>
 <pre><code>## [1] &quot;Gender&quot;
 ##         
-## facility   1   2
-##        0  49  40
-##        1 114  68
+## facility  1  2
+##        0 25 21
+##        1 50 31
 ## 
 ## 
 ## 
@@ -656,13 +659,13 @@ test</strong></p>
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  table(facility = far_data$Facility, far_data[[col]])[rowMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5, colMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5]
-## X-squared = 1.1343, df = 1, p-value = 0.2869
+## X-squared = 0.39095, df = 1, p-value = 0.5318
 ## 
 ## [1] &quot;Age&quot;
 ##         
-## facility   2   3   4   5
-##        0  57  16  10   3
-##        1 104  40  24   9
+## facility  2  3  4
+##        0 28 11  4
+##        1 49 22  7
 ## 
 ## 
 ## 
@@ -671,13 +674,13 @@ test</strong></p>
 ##  Pearson&#39;s Chi-squared test
 ## 
 ## data:  table(facility = far_data$Facility, far_data[[col]])[rowMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5, colMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5]
-## X-squared = 1.4589, df = 3, p-value = 0.6918
+## X-squared = 0.096204, df = 2, p-value = 0.953
 ## 
 ## [1] &quot;Education&quot;
 ##         
 ## facility  2  3  4  5
-##        0 16 30 32  8
-##        1 34 59 68  9
+##        0  6 14 19  6
+##        1  7 30 34  5
 ## 
 ## 
 ## 
@@ -686,28 +689,26 @@ test</strong></p>
 ##  Pearson&#39;s Chi-squared test
 ## 
 ## data:  table(facility = far_data$Facility, far_data[[col]])[rowMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5, colMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5]
-## X-squared = 1.553, df = 3, p-value = 0.6701
+## X-squared = 2.45, df = 3, p-value = 0.4844
 ## 
 ## [1] &quot;Location&quot;
-##         
-## facility   0   1
-##        0  43  46
-##        1 101  81
+##  0  1 
+## 46 81 
 ## 
 ## 
 ## 
 ## [1] &quot;Chi-squred test of Location&quot;
 ## 
-##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+##  Chi-squared test for given probabilities
 ## 
 ## data:  table(facility = far_data$Facility, far_data[[col]])[rowMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5, colMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5]
-## X-squared = 0.96584, df = 1, p-value = 0.3257
+## X-squared = 9.6457, df = 1, p-value = 0.001898
 ## 
 ## [1] &quot;Size&quot;
 ##         
 ## facility  1  2  3
-##        0 39 42  7
-##        1 67 87 22
+##        0 17 26  3
+##        1 27 43 10
 ## 
 ## 
 ## 
@@ -716,13 +717,13 @@ test</strong></p>
 ##  Pearson&#39;s Chi-squared test
 ## 
 ## data:  table(facility = far_data$Facility, far_data[[col]])[rowMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5, colMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5]
-## X-squared = 1.7091, df = 2, p-value = 0.4255
+## X-squared = 1.1387, df = 2, p-value = 0.5659
 ## 
 ## [1] &quot;Ageofbusiness&quot;
 ##         
-## facility  1  2  3  4  5
-##        0 24 48 10  4  2
-##        1 35 83 35 14 12
+## facility  1  2  3
+##        0 13 26  4
+##        1 14 43 15
 ## 
 ## 
 ## 
@@ -731,13 +732,13 @@ test</strong></p>
 ##  Pearson&#39;s Chi-squared test
 ## 
 ## data:  table(facility = far_data$Facility, far_data[[col]])[rowMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5, colMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5]
-## X-squared = 7.8909, df = 4, p-value = 0.09566
+## X-squared = 3.5036, df = 2, p-value = 0.1735
 ## 
 ## [1] &quot;DAP&quot;
 ##         
-## facility   1   2
-##        0   8  79
-##        1  25 156
+## facility  1  2
+##        0  5 41
+##        1  7 73
 ## 
 ## 
 ## 
@@ -746,7 +747,7 @@ test</strong></p>
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  table(facility = far_data$Facility, far_data[[col]])[rowMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5, colMeans(table(facility = far_data$Facility,     far_data[[col]])) &gt;= 5]
-## X-squared = 0.77173, df = 1, p-value = 0.3797</code></pre>
+## X-squared = 0.0056314, df = 1, p-value = 0.9402</code></pre>
 <p><strong>Interpret</strong></p>
 <p><code>Location</code> is the only data that can significantly predict
 whether an individual needs facilities in <strong>far</strong></p>
@@ -767,25 +768,25 @@ summary(far_model)</code></pre>
 ## Call:
 ## glm(formula = Facility ~ ., family = binomial, data = far_data)
 ## 
-## Coefficients:
+## Coefficients: (1 not defined because of singularities)
 ##               Estimate Std. Error z value Pr(&gt;|z|)  
-## (Intercept)    0.38717    1.34495   0.288   0.7734  
-## Gender        -0.37187    0.28177  -1.320   0.1869  
-## Age            0.07421    0.18116   0.410   0.6821  
-## Education      0.03732    0.14554   0.256   0.7976  
-## Location      -0.31711    0.27525  -1.152   0.2493  
-## Size           0.27114    0.20495   1.323   0.1859  
-## Ageofbusiness  0.30035    0.17484   1.718   0.0858 .
-## DAP           -0.21909    0.49668  -0.441   0.6591  
+## (Intercept)   -0.98332    1.83691  -0.535   0.5924  
+## Gender        -0.25917    0.40508  -0.640   0.5223  
+## Age           -0.11392    0.26194  -0.435   0.6636  
+## Education      0.09375    0.21231   0.442   0.6588  
+## Location            NA         NA      NA       NA  
+## Size           0.10605    0.32390   0.327   0.7433  
+## Ageofbusiness  0.48385    0.26359   1.836   0.0664 .
+## DAP            0.34386    0.66487   0.517   0.6050  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 329.42  on 260  degrees of freedom
-## Residual deviance: 315.75  on 253  degrees of freedom
-##   (10 observations deleted due to missingness)
-## AIC: 331.75
+##     Null deviance: 165.38  on 125  degrees of freedom
+## Residual deviance: 159.79  on 119  degrees of freedom
+##   (1 observation deleted due to missingness)
+## AIC: 173.79
 ## 
 ## Number of Fisher Scoring iterations: 4</code></pre>
 <p>The regression model backs up the <code>chi squared</code> test that
@@ -798,105 +799,74 @@ can be used as a predictor for if they need the facilities or not.</p>
 <h3>Prediction and Accuracy</h3>
 <pre class="r"><code>pred_far = predict(far_model)
 pred_far = ifelse(pred_far&gt; 0.5, 1, 0)
-reg_tab_far = table( actual_data = far_data$Facility, pred_far[1:271])
+reg_tab_far = table( actual_data = far_data$Facility[1:126] , predicted = pred_far)
 reg_tab_far</code></pre>
-<pre><code>##            
-## actual_data   0   1
-##           0  27  56
-##           1  56 122</code></pre>
+<pre><code>##            predicted
+## actual_data  0  1
+##           0 16 30
+##           1 34 46</code></pre>
 <div id="accuracy" class="section level4">
 <h4>accuracy</h4>
 <pre class="r"><code>acc_far = suppressWarnings(mean(pred_far == far_data$Facility))
 acc_far</code></pre>
-<pre><code>## [1] 0.5571956</code></pre>
-<p>This model is <code>55.71%</code> accurate</p>
+<pre><code>## [1] 0.488189</code></pre>
+<p>This model is <code>48.82%</code> accurate with coefficients of
+regression</p>
 <pre class="r"><code>odds_rat_far = exp(coef(far_model))
 odds_rat_far</code></pre>
 <pre><code>##   (Intercept)        Gender           Age     Education      Location 
-##     1.4728072     0.6894434     1.0770293     1.0380269     0.7282472 
+##     0.3740658     0.7716944     0.8923260     1.0982891            NA 
 ##          Size Ageofbusiness           DAP 
-##     1.3114560     1.3503258     0.8032478</code></pre>
-<p>This means that if a person is from <code>far</code> they will need
-the facilities in the university</p>
-<p><span class="math display">\[
-Need(faclity) = 2.088235 + far 0.000007
-\]</span></p>
-<p>so <code>0.0007%</code> of people from far need the facilities with
-atleast <code>2</code> people who will need the facilities</p>
+##     1.1118779     1.6223106     1.4103845</code></pre>
 </div>
 </div>
 </div>
-<div id="embakasi" class="section level2">
-<h2>Embakasi</h2>
-<pre class="r"><code>embakasi_data = SME_Training_Data %&gt;% mutate(Location = case_when(
-  Location != 2~0,
+<div id="near-nairobi" class="section level2">
+<h2>Near Nairobi</h2>
+<pre class="r"><code>library(dplyr, warn.conflicts = FALSE)
+near_nairobi = SME_Training_Data%&gt;% mutate(Location = case_when(
+  Location == 1~1,
+  Location == 2~1,
+  Location == 7~1,
+  Location == 9~1,
+  Location == 10 ~ 1,
   TRUE ~Location
 ))
-embakasi_data = embakasi_data[, c(2, 3, 4, 6, 7, 8, 9, 12)]
-colnames(embakasi_data)</code></pre>
+near_nairobi = near_nairobi %&gt;% mutate(Location = case_when(
+  Location != 1~0,
+  TRUE ~Location
+))</code></pre>
+<pre class="r"><code>near_nairobi = near_nairobi[, c(2, 3, 4, 6, 7, 8, 9, 12)]
+colnames(near_nairobi)</code></pre>
 <pre><code>## [1] &quot;Gender&quot;        &quot;Age&quot;           &quot;Education&quot;     &quot;Location&quot;     
 ## [5] &quot;Size&quot;          &quot;Ageofbusiness&quot; &quot;DAP&quot;           &quot;Facility&quot;</code></pre>
-<pre class="r"><code>for(col in colnames(embakasi_data)[1: 7]){
+<pre class="r"><code>near_nairobi = near_nairobi[near_nairobi$Location == 0,]</code></pre>
+<pre class="r"><code>predictor_near_nai = colnames(near_nairobi[1:7])
+predictor_near_nai</code></pre>
+<pre><code>## [1] &quot;Gender&quot;        &quot;Age&quot;           &quot;Education&quot;     &quot;Location&quot;     
+## [5] &quot;Size&quot;          &quot;Ageofbusiness&quot; &quot;DAP&quot;</code></pre>
+<div id="create-the-model-for-near-nairobi" class="section level3">
+<h3>Create the model for near Nairobi</h3>
+<pre class="r"><code>for(col in predictor_near_nai){
   print(col)
-  print(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]]))
-}</code></pre>
-<pre><code>## [1] &quot;Gender&quot;
-##         
-## facility   1   2
-##        0  49  40
-##        1 114  68
-## [1] &quot;Age&quot;
-##         
-## facility   1   2   3   4   5   6
-##        0   3  57  16  10   3   0
-##        1   1 104  40  24   9   4
-## [1] &quot;Education&quot;
-##         
-## facility  1  2  3  4  5  6
-##        0  2 16 30 32  8  1
-##        1  5 34 59 68  9  6
-## [1] &quot;Location&quot;
-##         
-## facility   0   2
-##        0  73  16
-##        1 157  25
-## [1] &quot;Size&quot;
-##         
-## facility  1  2  3  4  5
-##        0 39 42  7  0  0
-##        1 67 87 22  3  2
-## [1] &quot;Ageofbusiness&quot;
-##         
-## facility  1  2  3  4  5
-##        0 24 48 10  4  2
-##        1 35 83 35 14 12
-## [1] &quot;DAP&quot;
-##         
-## facility   1   2
-##        0   8  79
-##        1  25 156</code></pre>
-<pre class="r"><code>embakasi_cols = colnames(embakasi_data[1:7])
-for(col in embakasi_cols){
-  print(col)
-  print(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]])) &gt;= 5,
-              colMeans(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]])) &gt;= 5])
+  print(table(facility = near_nairobi$Facility,
+              near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,
+              near_nairobi[[col]])) &gt;= 5,
+              colMeans(table(facility = near_nairobi$Facility,
+              near_nairobi[[col]])) &gt;= 5])
   cat(&quot;\n\n\n&quot;)
   print(paste(&quot;Chi-squred test of&quot;, col))
-  print(suppressWarnings(chisq.test(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]])) &gt;= 5,
-              colMeans(table(facility = embakasi_data$Facility,
-              embakasi_data[[col]])) &gt;= 5])))
+  print(suppressWarnings(chisq.test(table(facility = near_nairobi$Facility,
+              near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,
+              near_nairobi[[col]])) &gt;= 5,
+              colMeans(table(facility = near_nairobi$Facility,
+              near_nairobi[[col]])) &gt;= 5])))
 }</code></pre>
 <pre><code>## [1] &quot;Gender&quot;
 ##         
-## facility   1   2
-##        0  49  40
-##        1 114  68
+## facility  1  2
+##        0 24 19
+##        1 64 37
 ## 
 ## 
 ## 
@@ -904,14 +874,14 @@ for(col in embakasi_cols){
 ## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  table(facility = embakasi_data$Facility, embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5, colMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5]
-## X-squared = 1.1343, df = 1, p-value = 0.2869
+## data:  table(facility = near_nairobi$Facility, near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5, colMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5]
+## X-squared = 0.44094, df = 1, p-value = 0.5067
 ## 
 ## [1] &quot;Age&quot;
 ##         
-## facility   2   3   4   5
-##        0  57  16  10   3
-##        1 104  40  24   9
+## facility  2  3  4
+##        0 29  5  6
+##        1 55 18 17
 ## 
 ## 
 ## 
@@ -919,14 +889,14 @@ for(col in embakasi_cols){
 ## 
 ##  Pearson&#39;s Chi-squared test
 ## 
-## data:  table(facility = embakasi_data$Facility, embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5, colMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5]
-## X-squared = 1.4589, df = 3, p-value = 0.6918
+## data:  table(facility = near_nairobi$Facility, near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5, colMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5]
+## X-squared = 1.673, df = 2, p-value = 0.4332
 ## 
 ## [1] &quot;Education&quot;
 ##         
-## facility  2  3  4  5
-##        0 16 30 32  8
-##        1 34 59 68  9
+## facility  2  3  4
+##        0 10 16 13
+##        1 27 29 34
 ## 
 ## 
 ## 
@@ -934,29 +904,27 @@ for(col in embakasi_cols){
 ## 
 ##  Pearson&#39;s Chi-squared test
 ## 
-## data:  table(facility = embakasi_data$Facility, embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5, colMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5]
-## X-squared = 1.553, df = 3, p-value = 0.6701
+## data:  table(facility = near_nairobi$Facility, near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5, colMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5]
+## X-squared = 0.93227, df = 2, p-value = 0.6274
 ## 
 ## [1] &quot;Location&quot;
-##         
-## facility   0   2
-##        0  73  16
-##        1 157  25
+##   0   1 
+##  43 101 
 ## 
 ## 
 ## 
 ## [1] &quot;Chi-squred test of Location&quot;
 ## 
-##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+##  Chi-squared test for given probabilities
 ## 
-## data:  table(facility = embakasi_data$Facility, embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5, colMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5]
-## X-squared = 0.53962, df = 1, p-value = 0.4626
+## data:  table(facility = near_nairobi$Facility, near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5, colMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5]
+## X-squared = 23.361, df = 1, p-value = 1.343e-06
 ## 
 ## [1] &quot;Size&quot;
 ##         
 ## facility  1  2  3
-##        0 39 42  7
-##        1 67 87 22
+##        0 22 16  4
+##        1 40 44 12
 ## 
 ## 
 ## 
@@ -964,14 +932,14 @@ for(col in embakasi_cols){
 ## 
 ##  Pearson&#39;s Chi-squared test
 ## 
-## data:  table(facility = embakasi_data$Facility, embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5, colMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5]
-## X-squared = 1.7091, df = 2, p-value = 0.4255
+## data:  table(facility = near_nairobi$Facility, near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5, colMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5]
+## X-squared = 1.3721, df = 2, p-value = 0.5036
 ## 
 ## [1] &quot;Ageofbusiness&quot;
 ##         
 ## facility  1  2  3  4  5
-##        0 24 48 10  4  2
-##        1 35 83 35 14 12
+##        0 11 22  6  2  1
+##        1 21 40 20  8  9
 ## 
 ## 
 ## 
@@ -979,14 +947,14 @@ for(col in embakasi_cols){
 ## 
 ##  Pearson&#39;s Chi-squared test
 ## 
-## data:  table(facility = embakasi_data$Facility, embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5, colMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5]
-## X-squared = 7.8909, df = 4, p-value = 0.09566
+## data:  table(facility = near_nairobi$Facility, near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5, colMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5]
+## X-squared = 4.1539, df = 4, p-value = 0.3856
 ## 
 ## [1] &quot;DAP&quot;
 ##         
-## facility   1   2
-##        0   8  79
-##        1  25 156
+## facility  1  2
+##        0  3 38
+##        1 18 83
 ## 
 ## 
 ## 
@@ -994,36 +962,46 @@ for(col in embakasi_cols){
 ## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  table(facility = embakasi_data$Facility, embakasi_data[[col]])[rowMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5, colMeans(table(facility = embakasi_data$Facility,     embakasi_data[[col]])) &gt;= 5]
-## X-squared = 0.77173, df = 1, p-value = 0.3797</code></pre>
-<p><code>Age of the Business</code> is the only data that can
-significantly predict whether an individual needs facilities in
-<strong>far</strong></p>
-<pre class="r"><code>split_embakasi =  sample(1:nrow(embakasi_data), 0.8* nrow(embakasi_data))
-train_embakasi = embakasi_data[split_embakasi,]
-test_embakasi = embakasi_data[-split_embakasi,]</code></pre>
-<pre class="r"><code>embakasi_model = glm(Facility~Location,
-                    data = train_embakasi, family = binomial)
-summary(embakasi_model)</code></pre>
+## data:  table(facility = near_nairobi$Facility, near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5, colMeans(table(facility = near_nairobi$Facility,     near_nairobi[[col]])) &gt;= 5]
+## X-squared = 1.7881, df = 1, p-value = 0.1812</code></pre>
+</div>
+<div id="model-analysis" class="section level3">
+<h3>model analysis</h3>
+<pre class="r"><code>mod_nai = glm(Facility~., data = near_nairobi)
+pred_nai = predict(mod_nai)
+acc_nai = suppressWarnings(mean(pred_far == far_data$Facility))
+acc_nai</code></pre>
+<pre><code>## [1] 0.488189</code></pre>
+</div>
+<div id="model-summary" class="section level3">
+<h3>Model summary</h3>
+<pre class="r"><code>summary(mod_nai)</code></pre>
 <pre><code>## 
 ## Call:
-## glm(formula = Facility ~ Location, family = binomial, data = train_embakasi)
+## glm(formula = Facility ~ ., data = near_nairobi)
 ## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)   0.7679     0.1589   4.833 1.34e-06 ***
-## Location     -0.4184     0.2021  -2.071   0.0384 *  
+## Coefficients: (1 not defined because of singularities)
+##                Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)    0.772506   0.359398   2.149   0.0335 *
+## Gender        -0.083168   0.082523  -1.008   0.3154  
+## Age            0.040093   0.049288   0.813   0.4175  
+## Education     -0.008003   0.039669  -0.202   0.8404  
+## Location             NA         NA      NA       NA  
+## Size           0.085947   0.049473   1.737   0.0847 .
+## Ageofbusiness  0.023310   0.043340   0.538   0.5916  
+## DAP           -0.124320   0.131349  -0.946   0.3457  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## (Dispersion parameter for binomial family taken to be 1)
+## (Dispersion parameter for gaussian family taken to be 0.2018436)
 ## 
-##     Null deviance: 273.00  on 211  degrees of freedom
-## Residual deviance: 268.75  on 210  degrees of freedom
-##   (28 observations deleted due to missingness)
-## AIC: 272.75
+##     Null deviance: 27.733  on 134  degrees of freedom
+## Residual deviance: 25.836  on 128  degrees of freedom
+##   (23 observations deleted due to missingness)
+## AIC: 175.89
 ## 
-## Number of Fisher Scoring iterations: 4</code></pre>
+## Number of Fisher Scoring iterations: 2</code></pre>
+</div>
 </div>
 </div>
 
