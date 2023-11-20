@@ -20,8 +20,88 @@ head(SME_Training_Data)
 
 ***Note:*** Include binary & ordinal responses but disregard categorical
 
+## Exploritory analysis
+
+### Type of data in each column
+
 ```{r}
 str(SME_Training_Data)
+```
+
+### Missing-ness of the data 
+
+```{r}
+library(dplyr, warn.conflicts = FALSE)
+library(tidyverse)
+library(finalfit)
+```
+
+```{r}
+missing_plot(SME_Training_Data)
+```
+
+### **Figure out the number of data points for each location in the data**
+
+```{r}
+location = SME_Training_Data$Location
+min(location, na.rm = TRUE)
+max(location, na.rm = TRUE)
+```
+
+#### **Convert Na values to region 10**
+
+```{r}
+SME_Training_Data$Location[is.na(SME_Training_Data$Location)] = 10
+```
+
+```{r}
+location = SME_Training_Data$Location
+min(location)
+max(location)
+```
+
+### Re-code the data back to string 
+
+```{r}
+locality = data.frame(town = location, count = rep(1, length(location)))
+locality = locality %>% group_by(town) %>% summarise(count = sum(count))
+locality
+```
+
+```{r}
+#  'Ruaraka' = 1
+#  'Embakasi' = 2
+#  'Langata' = 3
+#  'Starehe' = 4
+#  'Mathare' = 5
+#  'Kibra' = 6
+#  'Dagoretti' = 7
+#  'Westlands' = 8
+#  'Roysambu' = 9
+#  'Kasarani' = 10
+#  'Kamukunji' = 11
+#  'Other' = 12
+locality$town = ifelse(locality$town == 1, 'Ruaraka', ifelse(
+  locality$town == 2, 'Embakasi',ifelse(
+    locality$town == 3, 'Langata',ifelse(
+      locality$town == 4, 'Starehe',ifelse(
+        locality$town == 5, 'Mathare',ifelse(
+          locality$town == 6, 'Kibra',ifelse(
+            locality$town == 7, 'Dagoreti',ifelse(
+              locality$town == 8, 'Westlands',ifelse(
+                locality$town == 9, 'Roysambu',ifelse(
+                  locality$town == 10, 'other',locality$town
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+  )
+locality
 ```
 
 **Ordinal Data**
@@ -38,7 +118,9 @@ str(SME_Training_Data)
 2.  Facility needed `Facility`
 3.  Presence of Disabled persons `DAP`
 
-## Ruaraka
+The data for `location` was grouped into `near Nairobi` and `far from Nairobi` based on ease of walking from the town to the CBD
+
+## Near Nairobi
 
 Facility `2` is No and `1` is yes encoding is done such that yes becomes `1` and no becomes `0`
 
