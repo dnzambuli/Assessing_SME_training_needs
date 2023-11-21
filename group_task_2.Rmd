@@ -13,12 +13,28 @@ head(SME_Training_Data)
 
 # Based on Region
 
+## Add a columns for virtual learning, physical learning and combined learning 
+
+The columns shall be named
+
+1.  `face-2face` for physical
+2.  `online_learn` for virtual
+3.  `physical_virtual` for combined virtual and physical
+
+```{r}
+SME_Training_Data$face_2_face = as.factor(ifelse(SME_Training_Data$Learning == 1, 1, 0))
+SME_Training_Data$online_learn = as.factor(ifelse(SME_Training_Data$Learning == 2, 1, 0))
+SME_Training_Data$physical_virtual = as.factor(ifelse(SME_Training_Data$Learning == 3, 1, 0))
+```
+
 **Task**
 
 1.  Comparing diff regions to see what ways they are similar & where they differ
 2.  The `response variable` if they need the facility for training
 
 ***Note:*** Include binary & ordinal responses but disregard categorical
+
+### Re-label the factor columns
 
 ## Exploritory analysis
 
@@ -28,10 +44,71 @@ head(SME_Training_Data)
 str(SME_Training_Data)
 ```
 
+### 
+
+```{r}
+# gender 2 female 1 male
+SME_Training_Data$Gender = as.factor(ifelse(SME_Training_Data$Gender == 2, "Female", "MALE"))
+```
+
+```{r}
+SME_Training_Data$Education = as.factor(ifelse(
+  SME_Training_Data$Education == 1, 'Primary', ifelse(
+    SME_Training_Data$Education == 2, 'Secondary',
+    ifelse(SME_Training_Data$Education == 3, 'Diploma', 
+           ifelse(
+             SME_Training_Data$Education == 4, 'Undergraduate',
+             ifelse(SME_Training_Data$Education == 5, 'Post Grad',
+                    ifelse(SME_Training_Data$Education == 6, 'Other', SME_Training_Data$Education))
+           ))
+  )
+))
+```
+
+```{r}
+SME_Training_Data$Age = as.factor(ifelse(SME_Training_Data$Age == 1, 'below 20',
+                                         ifelse(SME_Training_Data$Age == 2, '21 to 30',
+                                                ifelse(SME_Training_Data$Age == 3, '31 to 40',ifelse(SME_Training_Data$Age == 4, '41 to 50',ifelse(SME_Training_Data$Age == 5, '51 to 60',ifelse(SME_Training_Data$Age == 6, 'above 60', SME_Training_Data$Age)))))))
+```
+
+```{r}
+SME_Training_Data$Size = as.factor(ifelse(SME_Training_Data$Size == 1, '1', ifelse(
+  SME_Training_Data$Size == 2, '2 to 4', ifelse(
+    SME_Training_Data$Size == 3, '5 to 10',ifelse(
+      SME_Training_Data$Size == 4, '11 to 49', ifelse(
+        SME_Training_Data$Size == 5, 'above 50',SME_Training_Data$Size
+      )
+    )
+  )
+)))
+```
+
+```{r}
+SME_Training_Data$Ageofbusiness = as.factor(ifelse(
+  SME_Training_Data$Ageofbusiness == 1, '< 1 year',ifelse(
+    SME_Training_Data$Ageofbusiness == 2, '1 to 3', ifelse(
+      SME_Training_Data$Ageofbusiness == 3, '4 to 6', ifelse(
+        SME_Training_Data$Ageofbusiness == 4, '6 to 10', ifelse(
+          SME_Training_Data$Ageofbusiness == 5, '< 10 years', SME_Training_Data$Ageofbusiness
+        )
+      )
+    )
+  )
+))
+```
+
+```{r}
+SME_Training_Data$DAP = as.factor(ifelse(
+  SME_Training_Data$DAP == 1, 'YES',ifelse(
+    SME_Training_Data$DAP == 2, 'No', SME_Training_Data$DAP
+  )
+))
+```
+
 ### Missing-ness of the data
 
 ```{r}
-library(dplyr, warn.conflicts = FALSE)
+library(dplyr)
 library(tidyverse)
 library(finalfit)
 ```
@@ -170,19 +247,18 @@ colnames(SME_Training_Data)
 6.  DAP - 9
 7.  Gender = 2
 8.  Facility = 12
+9.  face_2_face = 17
+10. online_learn = 18
+11. physical_virtual = 19
 
 ```{r}
-far_data = far_data[, c(2, 3, 4, 6, 7, 8, 9, 12)]
+far_data = far_data[, c(2, 3, 4, 6, 7, 8, 9, 12, 17, 18, 19)]
 colnames(far_data)
 ```
 
 ```{r}
-far_cols = colnames(far_data)[1: 7]
+far_cols = cbind(colnames(far_data)[1: 7], colnames(far_data)[9:11])
 far_cols
-```
-
-```{r}
-far_data = far_data[far_data$Location == 1,]
 ```
 
 ### contingency tables
@@ -203,23 +279,17 @@ for(col in far_cols){
 for(col in far_cols){
   print(col)
   print(table(facility = far_data$Facility,
-              far_data[[col]])[rowMeans(table(facility = far_data$Facility,
-              far_data[[col]])) >= 5,
-              colMeans(table(facility = far_data$Facility,
-              far_data[[col]])) >= 5])
+              far_data[[col]]))
   cat("\n\n\n")
   print(paste("Chi-squred test of", col))
-  print(suppressWarnings(chisq.test(table(facility = far_data$Facility,
-              far_data[[col]])[rowMeans(table(facility = far_data$Facility,
-              far_data[[col]])) >= 5,
-              colMeans(table(facility = far_data$Facility,
-              far_data[[col]])) >= 5])))
+  print(fisher.test(table(facility = far_data$Facility,
+              far_data[[col]])))
 }
 ```
 
 **Interpret**
 
-`Location` is the only data that can significantly predict whether an individual needs facilities in **far**
+`face to face` data is the only data that has a p-value `<0.05` which indicates that the it is the best metric for predicting if individuals need the facilities
 
 ### Logistic model
 
@@ -242,105 +312,43 @@ far_model = glm(Facility~.,
 summary(far_model)
 ```
 
-The regression model backs up the `chi squared` test that indicated none of the variables (`Gender, Age group, Education level, location of the business, age of the busioness or whether someone is disabled` can be used as a predictor for if they need the facilities or not.
+**Seeing if the key predictor value improves the model prediction**
+
+```{r}
+far_model_2 = glm(Facility~ face_2_face,
+                    data = far_data, family = binomial)
+summary(far_model_2)
+```
+
+The second model is better at discriminating if individuals will need the facility or not as the AIC value is `1.163987%` smaller
+
+This means that a person will be less likely to need the facilities if they are physical than if they are not physical.
 
 ### Prediction and Accuracy
 
 ```{r}
-pred_far = predict(far_model)
+pred_far = predict(far_model_2)
 pred_far = ifelse(pred_far> 0.5, 1, 0)
-reg_tab_far = table( actual_data = far_data$Facility[1:126] , predicted = pred_far)
+reg_tab_far = table( actual_data = far_data$Facility , predicted = pred_far[1:271])
 reg_tab_far
 ```
 
 #### accuracy
 
 ```{r}
-acc_far = suppressWarnings(mean(pred_far == far_data$Facility))
+acc_far = mean(pred_far == far_data$Facility)
 acc_far
 ```
 
-This model is `48.82%` accurate with coefficients of regression
+This model is `56.82%` accurate. This means that for every 100 individuals that are selected and need the facility. The model is able to accurately select `57` individuals while it mislabels the remaining `43` individuals as people who do not need the facility
 
 ```{r}
-odds_rat_far = exp(coef(far_model))
+odds_rat_far = exp(coef(far_model_2))
 odds_rat_far
 ```
 
-## Near Nairobi
+The second model also predicts that
 
-```{r}
-library(dplyr, warn.conflicts = FALSE)
-near_nairobi = SME_Training_Data%>% mutate(Location = case_when(
-  Location == 1~1,
-  Location == 2~1,
-  Location == 7~1,
-  Location == 9~1,
-  Location == 10 ~ 1,
-  TRUE ~Location
-))
-near_nairobi = near_nairobi %>% mutate(Location = case_when(
-  Location != 1~0,
-  TRUE ~Location
-))
-```
+$$ f(need\ facility\ YES |face\ to\ face) = \frac{1}{1+ e^{-2.66667 - 0.5145\ face\ to\ face)}}  $$
 
-```{r}
-near_nairobi = near_nairobi[, c(2, 3, 4, 6, 7, 8, 9, 12)]
-colnames(near_nairobi)
-```
-
-```{r}
-near_nairobi = near_nairobi[near_nairobi$Location == 0,]
-```
-
-```{r}
-predictor_near_nai = colnames(near_nairobi[1:7])
-predictor_near_nai
-```
-
-### Create the model for near Nairobi
-
-```{r}
-for(col in predictor_near_nai){
-  print(col)
-  print(table(facility = near_nairobi$Facility,
-              near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,
-              near_nairobi[[col]])) >= 5,
-              colMeans(table(facility = near_nairobi$Facility,
-              near_nairobi[[col]])) >= 5])
-  cat("\n\n\n")
-  print(paste("Chi-squred test of", col))
-  print(suppressWarnings(chisq.test(table(facility = near_nairobi$Facility,
-              near_nairobi[[col]])[rowMeans(table(facility = near_nairobi$Facility,
-              near_nairobi[[col]])) >= 5,
-              colMeans(table(facility = near_nairobi$Facility,
-              near_nairobi[[col]])) >= 5])))
-}
-```
-
-### model analysis
-
-```{r}
-mod_nai = glm(Facility~., data = near_nairobi)
-pred_nai = predict(mod_nai)
-acc_nai = suppressWarnings(mean(pred_far == far_data$Facility))
-acc_nai
-```
-
-### Model summary
-
-```{r}
-summary(mod_nai)
-```
-
-# Trying a different analysis
-
-```{r}
-far_nairobi = SME_Training_Data%>% mutate(Facility = case_when(
-  Facility == 1 ~ 1,
-  Facility == 2 ~ 0,
-  TRUE ~ Facility
-))
-far_nairobi = far_nairobi[far_nairobi$Location %in% c(1, 2, 7, 9, 10),]
-```
+This backs up the initial model coefficient claim that a person is less likely to need the facilities if they are face to face
